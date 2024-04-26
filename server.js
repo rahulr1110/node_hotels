@@ -5,9 +5,11 @@ import { Person } from "./models/person.js";
 import { MenuItem } from "./models/menu.js";
 import { router as personRoute } from "./routes/personRoutes.js";
 import { router as menuRouter } from "./routes/menuitemRoutes.js";
+import dotenv from 'dotenv'
 
 const app = express();
 connectDB();
+dotenv.config()
 app.use(bodyParser.json());
 app.use("/person", personRoute);
 app.use("/menu", menuRouter);
@@ -54,6 +56,6 @@ app.use("/menu", menuRouter);
 //   }
 // });
 
-app.listen(3000, () => {
+app.listen(process.env.PORT, () => {
   console.log("server started");
 });
