@@ -1,60 +1,34 @@
 import express from "express";
 import connectDB from "./db.js";
 import bodyParser from "body-parser";
-import { Person } from "./models/person.js";
-import { MenuItem } from "./models/menu.js";
 import { router as personRoute } from "./routes/personRoutes.js";
 import { router as menuRouter } from "./routes/menuitemRoutes.js";
-import dotenv from 'dotenv'
-
+import { Strategy as LocalStrategy } from "passport-local";
+import { Person } from "./models/person.js";
+import { passport as passport } from "./auth.js";
+import dotenv from "dotenv";
+// import passport from "passport";
+dotenv.config();
 const app = express();
-connectDB();
-dotenv.config()
 app.use(bodyParser.json());
+connectDB();
+
+//passport
+
+//middleware functions
+const logResult = (req, res, next) => {
+  console.log(
+    `${new Date().toLocaleString()} Request made to : ${req.originalUrl}`
+  );
+  next();
+};
+app.use(passport.initialize());
+const localAuthmiddleware = passport.authenticate("local", { session: false });
+app.get("/", localAuthmiddleware, (req, res) => {
+  res.send("welcom to our hotel");
+});
 app.use("/person", personRoute);
 app.use("/menu", menuRouter);
-//person
-// app.post("/person", async (req, res) => {
-//   try {
-//     const person = await Person.create(req.body);
-
-//     res.status(200).json(person);
-//   } catch (error) {
-//     res.status(500).json(error);
-//   }
-// });
-
-// app.get("/persons", async (req, res) => {
-//   try {
-//     const persons = await Person.find();
-//     res.status(200).json(persons);
-//   } catch (error) {
-//     res.status(500).json(error);
-//   }
-// });
-// app.get("/person/:worktype", async (req, res) => {
-//   try {
-//     const worktype = req.params.worktype;
-//     if (worktype == "chef" || worktype == "waiter" || worktype == "manager") {
-//       const response = await Person.find({ work: worktype });
-//       console.log("response fetched");
-//       res.status(200).json(response);
-//     }
-//   } catch (error) {
-//     console.log(error);
-//     res.status(200).json({ error: "internal server error" });
-//   }
-// });
-
-//menu items
-// app.post("/menu", async (req, res) => {
-//   try {
-//     const menu = await MenuItem.create(req.body);
-//     res.status(200).json(menu);
-//   } catch (error) {
-//     res.status(500).json(error);
-//   }
-// });
 
 app.listen(process.env.PORT, () => {
   console.log("server started");
